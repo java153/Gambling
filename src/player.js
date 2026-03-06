@@ -10,6 +10,8 @@ export function createPlayer(camera, audio, museum) {
   const direction = new THREE.Vector3();
   const forward = new THREE.Vector3();
   const side = new THREE.Vector3();
+  const up = new THREE.Vector3(0, 1, 0);
+
   let yaw = Math.PI;
   let pitch = 0;
   let walkTime = 0;
@@ -33,14 +35,15 @@ export function createPlayer(camera, audio, museum) {
       forward.set(0, 0, -1).applyQuaternion(camera.quaternion);
       forward.y = 0;
       forward.normalize();
-      side.crossVectors(new THREE.Vector3(0, 1, 0), forward).normalize();
+      // IMPORTANT: forward x up gives "right". Previous cross order inverted A/D.
+      side.crossVectors(forward, up).normalize();
 
       direction.set(0, 0, 0);
       direction.addScaledVector(forward, -moveInput.z);
       direction.addScaledVector(side, moveInput.x);
       if (direction.lengthSq() > 0) direction.normalize();
 
-      const targetSpeed = 2.8;
+      const targetSpeed = 2.85;
       velocity.x += direction.x * targetSpeed * delta * 7.5;
       velocity.z += direction.z * targetSpeed * delta * 7.5;
 
