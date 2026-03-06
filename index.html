@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>The Quiet Museum</title>
+    <style>
+      html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #05070d; }
+      #app { width: 100%; height: 100%; }
+      #overlay {
+        position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        color: #e8e8f4; font-family: "Georgia", serif; letter-spacing: 0.18em; text-transform: uppercase;
+        background: radial-gradient(circle at center, rgba(10,13,20,0.52), rgba(3,4,8,0.96));
+        z-index: 10; cursor: pointer; user-select: none;
+      }
+      #overlay h1 { margin: 0; font-size: clamp(1.8rem, 5vw, 4rem); font-weight: 500; }
+      #overlay p { margin-top: 1.4rem; font-size: clamp(0.7rem, 1.5vw, 1rem); opacity: 0.8; text-align: center; max-width: 38rem; }
+      #overlay p.error { color: #ffb8b8; opacity: 1; letter-spacing: 0.06em; text-transform: none; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+      canvas { display: block; }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <div id="overlay"><h1>The Quiet Museum</h1><p id="overlay-text">Click to Enter</p></div>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.166.1/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.166.1/examples/jsm/"
+        }
+      }
+    </script>
+    <script>
+      window.__quietMuseumBooted = false;
+      setTimeout(() => {
+        if (window.__quietMuseumBooted) return;
+        const hint = document.getElementById('overlay-text');
+        if (!hint) return;
+        hint.classList.add('error');
+        hint.textContent = 'Failed to boot game script. On GitHub Pages, use ./src/main.js path and check CDN/import errors in DevTools.';
+      }, 2500);
+    </script>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
