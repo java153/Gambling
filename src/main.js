@@ -12,7 +12,8 @@ import { setupLighting } from './lighting.js';
 
 const app = document.getElementById('app');
 const overlay = document.getElementById('overlay');
-const overlayHint = overlay.querySelector('p');
+const overlayHint = document.getElementById('overlay-text');
+window.__quietMuseumBooted = true;
 
 const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.6));
@@ -78,11 +79,17 @@ async function startExperience() {
 }
 
 overlay.addEventListener('click', startExperience);
+overlay.addEventListener('touchstart', startExperience, { passive: true });
 
 document.addEventListener('pointerlockchange', () => {
   const locked = document.pointerLockElement === renderer.domElement;
   overlay.style.display = locked ? 'none' : 'flex';
   if (!locked) overlayHint.textContent = 'Click to Enter';
+});
+
+document.addEventListener('pointerlockerror', () => {
+  overlay.style.display = 'flex';
+  overlayHint.textContent = 'Pointer lock blocked. Click again, then move mouse inside window.';
 });
 
 window.addEventListener('resize', () => {
