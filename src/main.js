@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
-import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { createInputController } from './controls.js';
 import { createPlayer } from './player.js';
 import { createMuseum } from './museum.js';
@@ -12,6 +12,7 @@ import { setupLighting } from './lighting.js';
 
 const app = document.getElementById('app');
 const overlay = document.getElementById('overlay');
+const overlayHint = overlay.querySelector('p');
 
 const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.6));
@@ -61,13 +62,27 @@ composer.addPass(new ShaderPass({
 
 let last = performance.now();
 
-overlay.addEventListener('click', async () => {
-  input.lock();
+async function startExperience() {
+  overlayHint.textContent = 'Entering...';
   await audio.start();
-});
+
+  try {
+    input.lock();
+  } catch {
+    // Safari sometimes rejects pointer lock requests when timing is off.
+  }
+
+  if (!document.pointerLockElement) {
+    overlayHint.textContent = 'Click again to capture mouse';
+  }
+}
+
+overlay.addEventListener('click', startExperience);
 
 document.addEventListener('pointerlockchange', () => {
-  overlay.style.display = document.pointerLockElement ? 'none' : 'flex';
+  const locked = document.pointerLockElement === renderer.domElement;
+  overlay.style.display = locked ? 'none' : 'flex';
+  if (!locked) overlayHint.textContent = 'Click to Enter';
 });
 
 window.addEventListener('resize', () => {
